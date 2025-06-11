@@ -1,19 +1,31 @@
-# bu dosya main fast api yi içerecek
-
 from fastapi import FastAPI
-from sqlmodel import create_engine, SQLModel
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlmodel import SQLModel
+
 from .models import User
 
 app = FastAPI()
 
-sqlite_file_name = "user-service.db"
-sqlite_url = f"sqlite:///{sqlite_file_name}"
+DATABASE_URL = "postgresql+asyncpg://ugurcan:postgre@localhost:5432/user_service"
 
-connect_args = {"check_same_thread": False}
-engine = create_engine(sqlite_url, connect_args=connect_args)
+engine = create_async_engine(DATABASE_URL, echo=True)
 
-SQLModel.metadata.create_all(engine)
+AsyncSessionLocal = async_sessionmaker(
+    bind=engine,
+    expire_on_commit=False,
+)
 
+async def get_session():
+    async with AsyncSessionLocal() as session:
+        yield session
+
+async def init_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)
+
+@app.on_event("startup")
+async def on_startup():
+    await init_db()
 
 @app.get("/")
 def home():
