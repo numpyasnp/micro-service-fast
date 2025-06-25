@@ -2,11 +2,11 @@ from fastapi import FastAPI
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlmodel import SQLModel
 
-from .models import User
+from .models import Order
 
 app = FastAPI()
 
-DATABASE_URL = "postgresql+asyncpg://ugurcan:postgre@localhost:5432/user_service"
+DATABASE_URL = "postgresql+asyncpg://ugurcan:postgre@localhost:5432/order_service"
 
 engine = create_async_engine(DATABASE_URL, echo=True)
 
@@ -29,4 +29,4 @@ async def on_startup():
 
 @app.get("/")
 def home():
-    return {"message": "user-service-root"}
+    return {"message": "order_service-root"}
