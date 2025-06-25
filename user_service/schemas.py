@@ -19,3 +19,7 @@ class UserUpdate(BaseModel):
 class User(UserBase):
     id: int
     is_active: bool
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
